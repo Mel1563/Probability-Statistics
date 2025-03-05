@@ -1,0 +1,108 @@
+import java.util.*;
+
+class TablaFrecuencia {
+    private Map<Double, Integer> frecuenciaAbsoluta;
+    private int totalDatos;
+    private List<Clase> clases;
+
+    public TablaFrecuencia(double[] dataset) {
+        this.frecuenciaAbsoluta = new HashMap<>();
+        this.totalDatos = dataset.length;
+        calcularFrecuencia(dataset);
+        agruparEnClases(dataset);
+    }
+
+    private void calcularFrecuencia(double[] dataset) {
+        for (double dato : dataset) {
+            frecuenciaAbsoluta.put(dato, frecuenciaAbsoluta.getOrDefault(dato, 0) + 1);
+        }
+    }
+
+    private void agruparEnClases(double[] dataset) {
+        Arrays.sort(dataset);
+        int numClases = (int) Math.ceil(1 + 3.322 * Math.log10(dataset.length));
+        double rango = dataset[dataset.length - 1] - dataset[0];
+        double anchoClase = rango / numClases;
+        clases = new ArrayList<>();
+
+        double limiteInferior = dataset[0];
+        int frecuenciaAcumulada = 0;
+        double frecuenciaRelativaAcumulada = 0;
+
+        for (int i = 0; i < numClases; i++) {
+            double limiteSuperior = limiteInferior + anchoClase;
+            int frecuencia = 0;
+
+            for (double dato : dataset) {
+                if (dato >= limiteInferior && dato < limiteSuperior) {
+                    frecuencia++;
+                }
+            }
+
+            frecuenciaAcumulada += frecuencia;
+            double frecuenciaRelativa = (double) frecuencia / totalDatos;
+            frecuenciaRelativaAcumulada += frecuenciaRelativa;
+            double marcaClase = (limiteInferior + limiteSuperior) / 2;
+
+            clases.add(new Clase(limiteInferior, limiteSuperior, marcaClase, frecuencia, frecuenciaAcumulada, frecuenciaRelativa, frecuenciaRelativaAcumulada));
+
+            limiteInferior = limiteSuperior;
+        }
+    }
+
+    public double calcularMedia() {
+        double suma = 0;
+        for (Clase c : clases) {
+            suma += c.marcaClase * c.frecuencia;
+        }
+        return suma / totalDatos;
+    }
+
+    public double calcularMediana() {
+        int mitad = totalDatos / 2;
+        for (Clase c : clases) {
+            if (c.frecuenciaAcumulada >= mitad) {
+                return c.marcaClase;
+            }
+        }
+        return -1;
+    }
+
+    public double calcularModa() {
+        Clase modaClase = Collections.max(clases, Comparator.comparingInt(c -> c.frecuencia));
+        return modaClase.marcaClase;
+    }
+
+    public void imprimirTabla() {
+        System.out.printf("%-20s %-20s %-10s %-10s %-10s %-10s %-10s\n", "lim inf", "lim sup", "marca", "f", "fa", "fr", "fra");
+        System.out.println("------------------------------------------------------------------------------------------------");
+
+        for (Clase c : clases) {
+            System.out.printf("%-20.2f %-20.2f %-10.2f %-10d %-10d %-10.4f %-10.4f\n", c.limiteInferior, c.limiteSuperior, c.marcaClase, c.frecuencia, c.frecuenciaAcumulada, c.frecuenciaRelativa, c.frecuenciaRelativaAcumulada);
+        }
+    }
+
+    public static void main(String[] args) {
+        double[] dataset = {1.2, 2.5, 3.8, 1.2, 2.5, 1.2, 3.8, 4.0, 1.2, 2.5, 5.3, 6.7, 7.8, 8.9, 9.1, 10.5, 11.2, 12.3, 13.4, 14.5, 15.6, 16.7, 17.8, 18.9, 19.0, 20.1, 21.2, 22.3, 23.4, 24.5};
+        TablaFrecuencia tabla = new TablaFrecuencia(dataset);
+        tabla.imprimirTabla();
+        System.out.println("Media: " + tabla.calcularMedia());
+        System.out.println("Mediana: " + tabla.calcularMediana());
+        System.out.println("Moda: " + tabla.calcularModa());
+    }
+}
+
+class Clase {
+    double limiteInferior, limiteSuperior, marcaClase, frecuenciaRelativa, frecuenciaRelativaAcumulada;
+    int frecuencia, frecuenciaAcumulada;
+
+    public Clase(double limiteInferior, double limiteSuperior, double marcaClase, int frecuencia, int frecuenciaAcumulada, double frecuenciaRelativa, double frecuenciaRelativaAcumulada) {
+        this.limiteInferior = limiteInferior;
+        this.limiteSuperior = limiteSuperior;
+        this.marcaClase = marcaClase;
+        this.frecuencia = frecuencia;
+        this.frecuenciaAcumulada = frecuenciaAcumulada;
+        this.frecuenciaRelativa = frecuenciaRelativa;
+        this.frecuenciaRelativaAcumulada = frecuenciaRelativaAcumulada;
+    }
+}
