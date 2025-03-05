@@ -1,0 +1,89 @@
+class TablaFrecuencia: Definición de la clase principal que gestiona la tabla de frecuencias y el cálculo de medidas estadísticas.
+
+private Map<Double, Integer> frecuenciaAbsoluta: Declaración de un mapa que almacena la frecuencia absoluta de cada valor en el conjunto de datos.
+
+private int totalDatos: Variable que almacena el número total de datos en el dataset.
+
+private List<Clase> clases: Lista de objetos Clase que representan los intervalos de agrupación de los datos.
+
+public TablaFrecuencia(double[] dataset): Constructor de la clase que recibe un conjunto de datos en forma de arreglo de números decimales y realiza la inicialización de variables y el cálculo de frecuencias.
+
+this.frecuenciaAbsoluta = new HashMap<>(): Inicialización del mapa de frecuencias para almacenar la cantidad de veces que aparece cada número.
+
+this.totalDatos = dataset.length: Almacena el número total de elementos en el dataset.
+
+calcularFrecuencia(dataset): Llamado al método que calculará la frecuencia absoluta de cada valor en el dataset.
+
+agruparEnClases(dataset): Llamado al método que agrupará los valores en intervalos o clases según la Regla de Sturges.
+
+private void calcularFrecuencia(double[] dataset): Método privado que cuenta cuántas veces aparece cada número en el dataset y lo almacena en el mapa frecuenciaAbsoluta.
+
+for (double dato : dataset): Bucle que recorre cada número en el dataset.
+
+frecuenciaAbsoluta.put(dato, frecuenciaAbsoluta.getOrDefault(dato, 0) + 1): Incrementa en uno la frecuencia del número actual en el mapa de frecuencias, si el número no existe en el mapa lo inicializa con valor uno.
+
+private void agruparEnClases(double[] dataset): Método privado que se encarga de dividir los datos en clases o intervalos de acuerdo con la Regla de Sturges.
+
+Arrays.sort(dataset): Ordena los datos de menor a mayor para facilitar la creación de intervalos.
+
+int numClases = (int) Math.ceil(1 + 3.322 * Math.log10(dataset.length)): Calcula el número de clases utilizando la fórmula de Sturges, donde se toma el logaritmo base diez del número de datos, se multiplica por tres punto trescientos veintidós y se suma uno.
+
+double rango = dataset[dataset.length - 1] - dataset[0]: Calcula el rango restando el menor valor del dataset al mayor.
+
+double anchoClase = rango / numClases: Calcula el ancho de cada clase dividiendo el rango total entre el número de clases.
+
+clases = new ArrayList<>(): Inicializa la lista de clases que almacenará los intervalos generados.
+
+double limiteInferior = dataset[0]: Define el primer límite inferior del primer intervalo como el menor valor del dataset.
+
+int frecuenciaAcumulada = 0: Variable que almacenará la suma progresiva de las frecuencias de cada clase.
+
+double frecuenciaRelativaAcumulada = 0: Variable que almacenará la suma progresiva de las frecuencias relativas.
+
+for (int i = 0; i < numClases; i++): Bucle que recorre cada clase para asignarle un límite, calcular sus frecuencias y agregarla a la lista.
+
+double limiteSuperior = limiteInferior + anchoClase: Calcula el límite superior del intervalo sumando el ancho de la clase al límite inferior.
+
+int frecuencia = 0: Variable que almacenará la cantidad de datos que pertenecen al intervalo actual.
+
+for (double dato : dataset): Bucle que recorre el dataset para contar cuántos datos pertenecen a la clase actual.
+
+if (dato >= limiteInferior && dato < limiteSuperior): Condición que verifica si un dato está dentro del intervalo de la clase actual.
+
+frecuencia++: Incrementa la frecuencia de la clase cuando un dato pertenece a su intervalo.
+
+frecuenciaAcumulada += frecuencia: Suma la frecuencia de la clase actual a la frecuencia acumulada.
+
+double frecuenciaRelativa = (double) frecuencia / totalDatos: Calcula la frecuencia relativa dividiendo la frecuencia absoluta entre el total de datos.
+
+frecuenciaRelativaAcumulada += frecuenciaRelativa: Suma la frecuencia relativa de la clase actual a la frecuencia relativa acumulada.
+
+double marcaClase = (limiteInferior + limiteSuperior) / 2: Calcula la marca de clase promediando los límites inferior y superior.
+
+clases.add(new Clase(limiteInferior, limiteSuperior, marcaClase, frecuencia, frecuenciaAcumulada, frecuenciaRelativa, frecuenciaRelativaAcumulada)): Crea un objeto Clase con los valores calculados y lo agrega a la lista de clases.
+
+limiteInferior = limiteSuperior: Actualiza el límite inferior para la siguiente clase.
+
+public void imprimirTabla(): Método que imprime la tabla de frecuencias con todos los valores calculados.
+
+System.out.printf("%-20s %-20s %-10s %-10s %-10s %-10s %-10s\n", "lim inf", "lim sup", "marca", "f", "fa", "fr", "fra"): Imprime los encabezados de la tabla con formato alineado.
+
+for (Clase c : clases): Bucle que recorre cada objeto Clase en la lista de clases para imprimir sus valores.
+
+System.out.printf("%-20.2f %-20.2f %-10.2f %-10d %-10d %-10.4f %-10.4f\n", c.limiteInferior, c.limiteSuperior, c.marcaClase, c.frecuencia, c.frecuenciaAcumulada, c.frecuenciaRelativa, c.frecuenciaRelativaAcumulada): Imprime los valores de cada clase con formato alineado y precisión decimal.
+
+public static void main(String[] args): Método principal que ejecuta el programa.
+
+double[] dataset = {1.2, 2.5, 3.8, 1.2, 2.5, 1.2, 3.8, 4.0, 1.2, 2.5, 5.3, 6.7, 7.8, 8.9, 9.1, 10.5, 11.2, 12.3, 13.4, 14.5, 15.6, 16.7, 17.8, 18.9, 19.0, 20.1, 21.2, 22.3, 23.4, 24.5}: Define un conjunto de datos como un array de números decimales.
+
+TablaFrecuencia tabla = new TablaFrecuencia(dataset): Crea un objeto de la clase TablaFrecuencia y le pasa el dataset.
+
+tabla.imprimirTabla(): Llama al método imprimirTabla para mostrar la tabla de frecuencias en consola.
+
+class Clase: Define la clase auxiliar que representa una clase en la tabla de frecuencias.
+
+double limiteInferior, limiteSuperior, marcaClase, frecuenciaRelativa, frecuenciaRelativaAcumulada: Variables que almacenan los límites del intervalo, la marca de clase y las frecuencias relativas.
+
+int frecuencia, frecuenciaAcumulada: Variables que almacenan la frecuencia absoluta y la frecuencia acumulada.
+
+public Clase(double limiteInferior, double limiteSuperior, double marcaClase, int frecuencia, int frecuenciaAcumulada, double frecuenciaRelativa, double frecuenciaRelativaAcumulada): Constructor que inicializa una instancia de la clase Clase con los valores calculados.
