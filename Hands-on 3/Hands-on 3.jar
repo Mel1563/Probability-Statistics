@@ -1,0 +1,39 @@
+import java.util.*;
+
+class TablaFrecuencia {
+    private Map<String, Integer> frecuenciaAbsoluta;
+    private int totalDatos;
+
+    public TablaFrecuencia(String[] dataset) {
+        this.frecuenciaAbsoluta = new HashMap<>();
+        this.totalDatos = dataset.length;
+        calcularFrecuencia(dataset);
+    }
+
+    private void calcularFrecuencia(String[] dataset) {
+        for (String dato : dataset) {
+            frecuenciaAbsoluta.put(dato, frecuenciaAbsoluta.getOrDefault(dato, 0) + 1);
+        }
+    }
+
+    public void imprimirTabla() {
+        System.out.printf("%-20s %-10s %-10s %-10s\n", "categoria", "f", "fr", "% fr");
+        System.out.println("--------------------------------------------------");
+        
+        for (Map.Entry<String, Integer> entry : frecuenciaAbsoluta.entrySet()) {
+            String categoria = entry.getKey();
+            int f = entry.getValue();
+            double fr = (double) f / totalDatos;
+            double porcentaje = fr * 100;
+            
+            System.out.printf("%-20s %-10d %-10.4f %-10.2f%%\n", categoria, f, fr, porcentaje);
+        }
+    }
+
+    public static void main(String[] args) {
+        String[] dataset = {"rojo", "azul", "verde", "rojo", "azul", "rojo", "verde", "amarillo", "rojo", "azul"};
+        
+        TablaFrecuencia tabla = new TablaFrecuencia(dataset);
+        tabla.imprimirTabla();
+    }
+}
